@@ -1,0 +1,11 @@
+{
+  "network": "localhost",
+  "chainId": 1337,
+  "symbol": "ETH",
+  "address_BetGameFactory": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "startBlock_BetGameFactory": 1,
+  "address_RaffleContract": "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
+  "startBlock_RaffleContract": 24,
+  "address_Referral": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+  "startBlock_Referral": 3
+}

@@ -1,0 +1,336 @@
+type Raffle @entity {
+  id: ID!
+  chainId: Int! @index
+
+  raffleId: BigInt! @index
+  status: Int! @index
+  hasFree: Boolean!
+  platformFee: Int!
+  maxPerUser: Int!
+
+  startTime: BigInt!
+  endTime: BigInt! @index
+  cancelTime: BigInt
+  closeTime: BigInt
+  finishTime: BigInt
+
+  seller: User! @index
+  winner: User
+
+  price: BigInt!
+
+  ticketsCount: Int!
+  ticketsFree: Int!
+  participants: Int!
+  participantsFree: Int!
+
+  amountRaised: BigInt!
+  amountCollected: BigInt!
+  randomNumber: Int
+
+  title: String
+  note: String
+  image: String
+  category: String @index
+  token: Token
+
+  prize: RafflePrize @derivedFrom(field: "raffle")
+  eligibilities: [RaffleEligibility!] @derivedFrom(field: "raffle")
+
+  cancelEvent: RaffleCancelEvent @derivedFrom(field: "raffle")
+  closeEvent: RaffleCloseEvent @derivedFrom(field: "raffle")
+  endEvent: RaffleEndEvent @derivedFrom(field: "raffle")
+
+  createdAt: BigInt! @index
+  txHash: Bytes!
+}
+
+type RaffleEligibility @entity {
+  id: ID!
+  raffle: Raffle!
+  token: Bytes!
+  tokenId: BigInt!
+  amount: BigInt!
+}
+
+type RafflePrize @entity {
+  id: ID!
+  raffle: Raffle!
+  prizeType: Int!
+  token: Bytes!
+  amount: BigInt!
+  tokenId: BigInt!
+}
+
+type RaffleTicket @entity {
+  id: ID!
+  raffle: Raffle! @index
+  user: User! @index
+  ticketId: BigInt! @index
+  ticketCount: BigInt!
+  currentSize: BigInt!
+  cost: BigInt!
+  createdAt: BigInt! @index
+  txHash: Bytes
+}
+
+type RaffleActivity @entity {
+  id: ID!
+  raffle: Raffle!
+  user: User!
+  ticketId: BigInt!
+  ticketCount: BigInt!
+  currentSize: BigInt!
+  cost: BigInt!
+  note: String
+  createdAt: BigInt!
+  txHash: Bytes!
+}
+
+type RaffleParticipant @entity {
+  id: ID!
+  raffle: Raffle! @index
+  user: User! @index
+  ticketCount: BigInt!
+  cost: BigInt!
+}
+
+type RaffleCancelEvent @entity {
+  id: ID!
+  raffle: Raffle!
+  seller: User!
+  createdAt: BigInt!
+  txHash: Bytes!
+}
+
+type RaffleCloseEvent @entity {
+  id: ID!
+  raffle: Raffle!
+  caller: User!
+  createdAt: BigInt!
+  txHash: Bytes!
+}
+
+type RaffleEndEvent @entity {
+  id: ID!
+  raffle: Raffle!
+  winner: User!
+  number: BigInt!
+  createdAt: BigInt!
+  txHash: Bytes!
+}
+
+type ProtocolFee @entity {
+  id: ID!
+  chainId: Int!
+  key: String!
+  receiver: Bytes!
+  role: Int!
+  amount: BigInt!
+  createdAt: BigInt!
+  txHash: Bytes!
+}
+
+type User @entity {
+  id: ID!
+  referrer: User @index
+}
+
+type UserReferrerIncome @entity {
+  id: ID! # chainId_userId
+  chainId: Int!
+  user: User!
+  amount: BigInt!
+}
+
+type UserReferrer @entity {
+  id: ID!
+  chainId: Int! @index
+  user: User! @index
+  referrer: User! @index
+  referrer2: User
+  createdAt: BigInt! @index
+  txHash: Bytes!
+}
+
+type UserReferralReward @entity {
+  id: ID!
+  chainId: Int! @index
+  playType: String! @index
+  key: String!
+  user: User! @index
+  referrer: User! @index
+  value: BigInt!
+  amount: BigInt!
+  createdAt: BigInt! @index
+  txHash: Bytes!
+}
+
+type Token @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String @index
+  name: String
+  symbol: String @index
+  decimals: Int
+
+  tokenId: BigInt
+  tokenURI: String
+  metadata: TokenMetadata
+}
+
+type TokenMetadata @entity {
+  id: ID!
+  name: String
+  image: String
+  description: String
+}
+
+type BetGame @entity {
+  id: ID!
+  chainId: Int! @index
+  playType: String! @index
+  name: String! @index
+  address: Bytes! @index
+  staking: Bytes!
+}
+
+type Bet @entity {
+  id: ID!
+  chainId: Int! @index
+
+  game: BetGame! @index
+
+  betId: BigInt! @index
+  player: User! @index
+  betAmount: BigInt!
+  betStatus: Int!
+  payout: BigInt
+  jackpot: BigInt
+  streakBonus: BigInt
+  drawNumbers: [BigInt!]
+  note: String
+
+  multiplier: BigInt
+  betType: Int
+  betNumber: BigInt
+  rangeEnd: BigInt
+  isOver: Boolean
+  betPrize: Int
+
+  createdAt: BigInt! @index
+  txHash: Bytes!
+
+  closeAt: BigInt
+  closeTx: Bytes
+}
+
+type BetGameClaim @entity {
+  id: ID!
+  chainId: Int! @index
+  game: BetGame! @index
+  player: User! @index
+  value: BigInt!
+  poolAmt: BigInt!
+  createdAt: BigInt!
+  txHash: Bytes!
+}
+
+type BetGamePlayer @entity {
+  id: ID!
+  chainId: Int! @index
+  game: BetGame! @index
+  player: User! @index
+  winnings: BigInt!
+  claims: BigInt!
+  lastBetAmount: BigInt
+  winStreak: Int
+  loseStreak: Int
+
+  playCount: Int
+  winCount: Int
+  LossCount: Int
+
+  playAmounts: BigInt
+  payouts: BigInt
+}
+
+type StakingPool @entity {
+  id: ID!
+  chainId: Int! @index
+  game: BetGame! @index
+
+  accumulatedRewardsPerShare: BigInt!
+  totalStaked: BigInt!
+  totalWeightedStake: BigInt!
+  totalRewardsReceived: BigInt!
+  totalRewardsDistributed: BigInt!
+  lastUpdateTimestamp: BigInt!
+
+  apr: BigInt!
+
+  payout: BigInt!
+}
+
+type StakingPlayer @entity {
+  id: ID!
+  chainId: Int! @index
+  game: BetGame! @index
+  player: User! @index
+
+  amount: BigInt!
+  weightedAmount: BigInt!
+  rewardDebt: BigInt!
+  autoCompound: Boolean!
+  lastUpdateTimestamp: BigInt!
+
+  stakes: BigInt!
+  rewards: BigInt!
+  claims: BigInt!
+}
+
+type StakingStake @entity {
+  id: ID!
+  chainId: Int! @index
+  game: BetGame! @index
+  player: User! @index
+  amount: BigInt!
+
+  createdAt: BigInt! @index
+  txHash: Bytes!
+}
+
+type StakingUnStake @entity {
+  id: ID!
+  chainId: Int! @index
+  game: BetGame! @index
+  player: User! @index
+  amount: BigInt!
+  fee: BigInt!
+  reward: BigInt!
+
+  createdAt: BigInt! @index
+  txHash: Bytes!
+}
+
+type StakingClaim @entity {
+  id: ID!
+  chainId: Int! @index
+  game: BetGame! @index
+  player: User! @index
+  amount: BigInt!
+
+  createdAt: BigInt! @index
+  txHash: Bytes!
+}
+
+type StakingFundGame @entity {
+  id: ID!
+  chainId: Int! @index
+  game: BetGame! @index
+  player: User! @index
+  amount: BigInt!
+
+  createdAt: BigInt! @index
+  txHash: Bytes!
+}

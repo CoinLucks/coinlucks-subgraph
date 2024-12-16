@@ -1,0 +1,11 @@
+{
+  "network": "chapel",
+  "chainId": 97,
+  "symbol": "BNB",
+  "address_BetGameFactory": "0x6D101834d146659d13AAB51621CAB75A6363d549",
+  "startBlock_BetGameFactory": 45381079,
+  "address_RaffleContract": "0xd1A0b428e8894f6Ddc98D33c75efd6b792a89844",
+  "startBlock_RaffleContract": 45384117,
+  "address_Referral": "0x3DF3B3F2395325020FA84b2322c59A80697769c8",
+  "startBlock_Referral": 45381066
+}

@@ -1,0 +1,11 @@
+{
+  "network": "https://opbnb-testnet.nodereal.io/v1/0c82854ee7404b588cb4da1d817afb35",
+  "chainId": 5611,
+  "symbol": "BNB",
+  "address_BetGameFactory": "0x99C15c8dCDEf9345e7740c593fA5df61Fa4bD8E1",
+  "startBlock_BetGameFactory": 44621571,
+  "address_RaffleContract": "0x0e3b47139fEF03a960b356fda8CAdb1769E6865e",
+  "startBlock_RaffleContract": 44639144,
+  "address_Referral": "0xAE8794fE674a8519abB023B93a836F542515a61E",
+  "startBlock_Referral": 44621575
+}

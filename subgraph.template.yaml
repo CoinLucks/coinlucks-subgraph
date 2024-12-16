@@ -1,0 +1,212 @@
+specVersion: 1.2.0
+description: CoinLucks protocol on {{network}}
+features:
+  - fullTextSearch
+  - grafting
+  - ipfsOnEthereumContracts
+  - nonDeterministicIpfs
+schema:
+  file: ./schema.graphql
+# indexerHints:
+#   prune: never
+templates:
+  - name: TokenMetadata
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      file: ./src/mappings/TokenMetadata.ts
+      handler: handleMetadata
+      entities:
+        - TokenMetadata
+      abis:
+        - name: TokenContract
+          file: ./abis/TokenMetadata.json
+  - name: BetGame
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: BetGame
+    context:
+      chainId:
+        type: Int
+        data: {{chainId}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      file: ./src/mappings/BetGame.ts
+      entities:
+        - Bet
+        - BetGame
+        - BetGameClaim
+        - BetGamePlayer
+        - UserReferralReward
+        - UserReferrerIncome
+      abis:
+        - name: BetGame
+          file: ./abis/BetGame.json
+        - name: DiceShake
+          file: ./abis/games/DiceShake.json
+        - name: CoinFlip
+          file: ./abis/games/CoinFlip.json
+        - name: Scratch69
+          file: ./abis/games/Scratch69.json
+      eventHandlers:
+        - event: BetPlaced(indexed uint256,indexed address,uint256,string)
+          handler: handleBetPlaced
+        - event: BetResult(indexed uint256,indexed address,uint32[],bool,uint256,uint256,uint256)
+          handler: handleBetResult
+        - event: Claim(indexed address,uint256,uint256)
+          handler: handleClaim
+        - event: ReferralReward(indexed uint256,indexed address,indexed address,uint256,uint256)
+          handler: handleReferralReward
+  - name: BetGameStaking
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: BetGameStaking
+    context:
+      chainId:
+        type: Int
+        data: {{chainId}}
+      betGame:
+        type: String
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      file: ./src/mappings/BetGameStaking.ts
+      entities:
+        - StakingPool
+        - StakingPlayer
+        - StakingStake
+        - StakingUnStake
+        - StakingClaim
+        - StakingFundGame
+      abis:
+        - name: BetGameStaking
+          file: ./abis/BetGameStaking.json
+      eventHandlers:
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Unstaked(indexed address,uint256,uint256,uint256)
+          handler: handleUnstaked
+        - event: RewardPaid(indexed address,uint256)
+          handler: handleRewardPaid
+        - event: RewardCompounded(indexed address,uint256,uint256)
+          handler: handleRewardCompounded
+        - event: AutoCompoundSet(indexed address,bool)
+          handler: handleAutoCompoundSet
+        - event: FundsProvidedToBetGame(indexed address,indexed address,uint256)
+          handler: handleFundsProvidedToBetGame
+dataSources:
+  - name: RaffleContract
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      address: "{{address_RaffleContract}}"
+      abi: RaffleContract
+      startBlock: {{startBlock_RaffleContract}}
+    context:
+      chainId:
+        type: Int
+        data: {{chainId}}
+      symbol:
+        type: String
+        data: {{symbol}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Raffle
+        - RaffleEligibility
+        - RafflePrize
+        - RaffleTicket
+        - RaffleActivity
+        - RaffleParticipant
+        - RaffleCancelEvent
+        - RaffleCloseEvent
+        - RaffleEndEvent
+        - User
+        - UserReferrer
+        - UserReferrerIncome
+        - UserReferralReward
+        - ProtocolFee
+      abis:
+        - name: RaffleContract
+          file: ./abis/RaffleContract.json
+        - name: TokenContract
+          file: ./abis/TokenMetadata.json
+      eventHandlers:
+        - event: RaffleCreated(indexed uint256,indexed address,uint256,string)
+          handler: handleRaffleCreated
+        - event: RaffleClosed(indexed uint256,indexed address,uint256)
+          handler: handleRaffleColsed
+        - event: RaffleCancelled(indexed uint256,indexed address,uint256)
+          handler: handleRaffleCancelled
+        - event: RaffleEnded(indexed uint256,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleRaffleEnded
+        - event: BuyTicket(indexed uint256,indexed address,uint256,uint256,uint256,string)
+          handler: handleBuyTicket
+        - event: TransferTickets(uint256,address,address,uint256[])
+          handler: handleTransferTickets
+        - event: ReferralReward(indexed uint256,indexed address,indexed address,uint256,uint256)
+          handler: handleReferralReward
+        - event: DistributeFee(indexed uint256,indexed address,uint256)
+          handler: handleDistributeFee
+        - event: TransferFund(indexed uint256,indexed address,uint256)
+          handler: handleTransferFund
+        - event: TransferPrize(indexed uint256,indexed address,(uint8,address,uint256,uint256))
+          handler: handleTransferPrize
+      file: ./src/mappings/RaffleContract.ts
+  - name: Referral
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      address: "{{address_Referral}}"
+      abi: Referral
+      startBlock: {{startBlock_Referral}}
+    context:
+      chainId:
+        type: Int
+        data: {{chainId}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - UserReferrer
+      abis:
+        - name: Referral
+          file: ./abis/Referral.json
+      eventHandlers:
+        - event: BindReferrer(indexed address,indexed address)
+          handler: handleBindReferrer
+      file: ./src/mappings/Referral.ts
+  - name: BetGameFactory
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      address: "{{address_BetGameFactory}}"
+      abi: BetGameFactory
+      startBlock: {{startBlock_BetGameFactory}}
+    context:
+      chainId:
+        type: Int
+        data: {{chainId}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - BetGame
+      abis:
+        - name: BetGameFactory
+          file: ./abis/BetGameFactory.json
+      eventHandlers:
+        - event: GameAdded(address,address,string,string)
+          handler: handleGameAdded
+      file: ./src/mappings/BetGameFactory.ts
